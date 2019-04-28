@@ -51,12 +51,12 @@ class Pong(object):
 		if self.ball.getXPos() == self.width: 
 			self.leftScore.setScore(self.leftScore.getScore() + 1)
 			self.leftScore.render()
-			return 'left'
+			return 'IncrementLeftScore'
 		# Hit right wall
 		if self.ball.getXPos() == 0:
 			self.rightScore.setScore(self.rightScore.getScore() + 1)
 			self.rightScore.render()
-			return 'right'
+			return 'IncrementRightScore'
 		return None
 
 	def collision(self, a, b, extraX = 0, extraY = 0):
@@ -99,11 +99,12 @@ class Pong(object):
 			self.net.render()
 
 	def gameFrame(self, move = None):
+		# Render ball first to remove debounce errors on re-run of function
 		self.ball.render()
 		self.handleCollisions()
 		score = self.incrementScore()
 		if score != None:
-			raise Exception(score)
+			raise Exception(self.incrementScore())
 		if move != None and 'l' in move:
 			self.leftPaddle.render(move[1])
 		if move != None and 'r' in move:

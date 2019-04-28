@@ -7,9 +7,10 @@ def gameLoop(game):
 		try:
 			game.gameFrame()
 		except Exception as state:
-			gameLoop(game)
-
-
+			formattedState = str(state)
+			if formattedState == 'IncrementLeftScore':
+				sys.stdout.write(formattedState)
+			pass
 
 def startGame():
 	game = Pong(80,24)
