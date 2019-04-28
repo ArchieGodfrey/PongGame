@@ -80,31 +80,38 @@ class Pong(object):
 		self.leftPaddle.render()
 		self.rightPaddle.render()
 
-	def runGame(self, state = 'run'):
-		while True:
-			time.sleep(0.05)
-			self.ball.render()
-			score = self.incrementScore()
-			if score != None:
-				raise Exception(score)
-			if self.collision(self.leftPaddle, self.ball):
-				self.ball.bounce()
-				self.leftPaddle.render(self.ball.getXPos(), self.ball.getYPos())
-			if self.collision(self.rightPaddle, self.ball):
-				self.ball.bounce()
-				self.rightPaddle.render(self.ball.getXPos(), self.ball.getYPos())
-			if self.collision(self.leftScore, self.ball, 1, 1):
-				self.leftScore.render(self.ball.getXPos(), self.ball.getYPos())
-			if self.collision(self.rightScore, self.ball, 1, 1):
-				self.rightScore.render(self.ball.getXPos(), self.ball.getYPos())
-			if self.collision(self.net, self.ball, 0, self.height):
-				self.ball.setNoFlash(True)
-				self.net.render()
+	def handleCollisions(self):
+		# Collisions that require actions
+		if self.collision(self.leftPaddle, self.ball):
+			self.ball.bounce()
+			self.leftPaddle.render(self.ball.getXPos(), self.ball.getYPos())
+		if self.collision(self.rightPaddle, self.ball):
+			self.ball.bounce()
+			self.rightPaddle.render(self.ball.getXPos(), self.ball.getYPos())
 		
-	def startGame(self):
+		# Collisions that only require re-renders
+		if self.collision(self.leftScore, self.ball, 1, 1):
+			self.leftScore.render(self.ball.getXPos(), self.ball.getYPos())
+		if self.collision(self.rightScore, self.ball, 1, 1):
+			self.rightScore.render(self.ball.getXPos(), self.ball.getYPos())
+		if self.collision(self.net, self.ball, 0, self.height):
+			self.ball.setNoFlash(True)
+			self.net.render()
+
+	def gameFrame(self, move = None):
+		self.ball.render()
+		self.handleCollisions()
+		score = self.incrementScore()
+		if score != None:
+			raise Exception(score)
+		if move != None and 'l' in move:
+			self.leftPaddle.render(move[1])
+		if move != None and 'r' in move:
+			self.rightPaddle.render(move[1])
+			
+	def setupGame(self):
 		self.initPositions()
 		self.initalRender()
-		self.runGame()
 		
 		
 
