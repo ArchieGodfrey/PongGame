@@ -31,7 +31,7 @@ class Pong(object):
 
 		self.leftScore = Score(White, 3, 5, self.width, self.height, 0)
 		self.rightScore = Score(White, 3, 5, self.width, self.height, 0)
-		self.net = Net(Green, 1, 2, self.width, self.height, 10)
+		self.net = Net(Green, 1, 2, self.width, self.height)
 
 		sys.stdout.flush()
 		for i in range(0, self.height):
@@ -76,6 +76,7 @@ class Pong(object):
 	def initalRender(self):
 		self.leftScore.render()
 		self.rightScore.render()
+		self.net.initalRender()
 		self.net.render()
 		self.leftPaddle.render()
 		self.rightPaddle.render()
@@ -99,9 +100,9 @@ class Pong(object):
 			self.net.render()
 
 	def gameFrame(self, move = None):
-		# Render ball first to remove debounce errors on re-run of function
-		self.ball.render()
+		# Render ball before score to remove debounce errors on re-run of function
 		self.handleCollisions()
+		self.ball.render()
 		score = self.incrementScore()
 		if score != None:
 			raise Exception(self.incrementScore())
