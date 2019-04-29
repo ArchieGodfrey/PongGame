@@ -13,9 +13,9 @@ class Paddle(Sprite):
         return str(" " * self.width)
 
     def move(self, dir):
-        if (self.getYPos() != 0 + int(self.height / 2)) and (self.getYPos() != self.parentHeight - int(self.height / 2)):
-            self.dir = dir
-            self.performMove(dir)
+            if self.getYPos() != 0 and self.getYPos() != self.parentHeight:
+                self.dir = dir
+                self.performMove(dir)
 
     def render(self, x = None, y = None):
         if (x != None and y != None):
