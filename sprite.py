@@ -58,15 +58,15 @@ class Sprite(object):
 
     def horizontalMove(self, dir):
         if dir == 'r':
-            self.setXPos(self.xPos + self.width)
+            self.setXPos(self.xPos + 1)
         else:
-            self.setXPos(self.xPos - self.width)
+            self.setXPos(self.xPos - 1)
 
     def verticalMove(self, dir):
         if dir == 'u':
-            self.setYPos(self.yPos + self.height)
+            self.setYPos(self.yPos + 1)
         else:
-            self.setYPos(self.yPos - self.height)
+            self.setYPos(self.yPos - 1)
     
     def performMove(self, dir):
         if dir == 'l' or dir == 'r':

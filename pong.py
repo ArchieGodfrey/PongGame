@@ -60,17 +60,16 @@ class Pong(object):
 		return None
 
 	def serveBall(self, side, response):
-		if response != None and 'l' in response:
+		if 'l' in response:
 			self.leftPaddle.render(response[1])
 			self.ball.setDir('r')
-			self.ball.prepareServe(self.leftPaddle.getXPos() + int(self.ball.getWidth() / 2), self.leftPaddle.getYPos() + int(self.leftPaddle.getHeight() / 2))
-		if response != None and 'r' in response:
+			self.ball.prepareServe(self.leftPaddle.getXPos() + self.ball.getWidth(), self.leftPaddle.getYPos() + int(self.leftPaddle.getHeight() / 2))
+		if 'r' in response:
 			self.rightPaddle.render(response[1])
 			self.ball.setDir('l')
-			self.ball.prepareServe(self.rightPaddle.getXPos() - int(self.ball.getWidth() / 2), self.rightPaddle.getYPos() + int(self.rightPaddle.getHeight() / 2))
+			self.ball.prepareServe(self.rightPaddle.getXPos() - self.ball.getWidth(), self.rightPaddle.getYPos() + int(self.rightPaddle.getHeight() / 2))
 		if response == 's':
 			return True
-		self.ball.render()
 		return False
 
 	def collision(self, a, b, extraX = 0, extraY = 0):
