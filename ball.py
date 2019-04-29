@@ -27,6 +27,11 @@ class Ball(Sprite):
 	def setNoFlash(self, toggle):
 		self.noFlash = toggle
 
+	def prepareServe(self, x, y):
+		self.printToConsole(Reset, self.getXPos(), self.getYPos(), self, self.parentWidth, self.parentHeight)
+		self.setXYPos(x, y)
+		self.printToConsole(self.getColor(), self.getXPos(), self.getYPos(), self, self.parentWidth, self.parentHeight)
+
 	def move(self, dir):
 		self.dir = dir
 		if len(dir) == 1:

@@ -1,7 +1,7 @@
 from pong import Pong
 import sys, time, tty
 
-ControllersConnected = True
+ControllersConnected = False
 
 def checkControllers():
 	if ControllersConnected:
@@ -17,6 +17,10 @@ def checkControllers():
 			return 'ru'
 		if char == 'l':
 			return 'rd'
+		if char == 'd':
+			return 's'
+		if char == 'k':
+			return 's'
 		if char == 'c':
 			raise Exception('Quit')
 		pass
@@ -25,15 +29,21 @@ def gameLoop(game):
 	while True:
 		time.sleep(0.05)
 		try:
-			move = checkControllers()
+			response = checkControllers()
 		except Exception as state:
 			break
 		try:
-			game.gameFrame(move)
+			game.gameFrame(response)
 		except Exception as state:
 			formattedState = str(state)
 			if formattedState == 'IncrementLeftScore':
-				sys.stdout.write(formattedState)
+				served = False
+				while not served:
+					response = checkControllers()
+					served = game.serveBall('l', response)
+			if formattedState == 'IncrementRightScore':
+				response = checkControllers()
+				game.serveBall('r', response)
 			pass
 
 def startGame():

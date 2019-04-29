@@ -59,6 +59,20 @@ class Pong(object):
 			return 'IncrementRightScore'
 		return None
 
+	def serveBall(self, side, response):
+		if response != None and 'l' in response:
+			self.leftPaddle.render(response[1])
+			self.ball.setDir('r')
+			self.ball.prepareServe(self.leftPaddle.getXPos() + int(self.ball.getWidth() / 2), self.leftPaddle.getYPos() + int(self.leftPaddle.getHeight() / 2))
+		if response != None and 'r' in response:
+			self.rightPaddle.render(response[1])
+			self.ball.setDir('l')
+			self.ball.prepareServe(self.rightPaddle.getXPos() - int(self.ball.getWidth() / 2), self.rightPaddle.getYPos() + int(self.rightPaddle.getHeight() / 2))
+		if response == 's':
+			return True
+		self.ball.render()
+		return False
+
 	def collision(self, a, b, extraX = 0, extraY = 0):
 		# Subtract one to account for original position
 		xA = a.getXPos() - extraX
@@ -105,7 +119,7 @@ class Pong(object):
 		self.ball.render()
 		score = self.incrementScore()
 		if score != None:
-			raise Exception(self.incrementScore())
+			raise Exception(score)
 		if move != None and 'l' in move:
 			self.leftPaddle.render(move[1])
 		if move != None and 'r' in move:
