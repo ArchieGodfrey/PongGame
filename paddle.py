@@ -13,11 +13,14 @@ class Paddle(Sprite):
         return str(" " * self.width)
 
     def move(self, dir):
-            if self.getYPos() != 0 and self.getYPos() != self.parentHeight:
-                self.dir = dir
-                self.performMove(dir)
+        if (self.getYPos() > int(self.height / 2)) and not 'u' in dir:
+		    self.dir = dir
+		    self.performMove(dir)
+	if (self.getYPos() < self.parentHeight - self.height) and not 'd' in dir:
+		self.dir = dir
+            	self.performMove(dir)
 
-    def render(self, x = None, y = None):
+    def render(self, dir = None, x = None, y = None):
         if (x != None and y != None):
             self.printToConsole(self.getColor(), x, y, self, self.parentWidth, self.parentHeight)
             return
