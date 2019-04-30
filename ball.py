@@ -14,10 +14,11 @@ class Ball(Sprite):
 			'd' : 'u',
 			'r' : 'l',
 			'l' : 'r',
-			'ur' : 'dr',
-			'ul' : 'dl',
-			'dr' : 'ur',
-			'dl' : 'ul',
+			'ru' : 'rd',
+			'lu' : 'ld',
+			'rd' : 'ru',
+			'ld' : 'lu',
+			''   : ''
 		}
 		self.noFlash = False
 
@@ -53,33 +54,33 @@ class Ball(Sprite):
 		# Hit left wall
 		if self.getXPos() == 0: 
 			if 'u' in self.getDir():
-				self.setDir('ur')
+				self.setDir('ru')
 			elif 'd' in self.getDir():
-				self.setDir('dr')
+				self.setDir('rd')
 			else:
 				self.setDir('r')
 		# Hit right wall
 		if self.getXPos() == self.parentWidth:
 			if 'u' in self.getDir():
-				self.setDir('ul')
+				self.setDir('lu')
 			elif 'd' in self.getDir():
-				self.setDir('dl')
+				self.setDir('ld')
 			else:
 				self.setDir('l')
 		# Hit bottom wall
 		if self.getYPos() == 0:
 			if 'r' in self.getDir():
-				self.setDir('ur')
+				self.setDir('ru')
 			elif 'l' in self.getDir():
-				self.setDir('ul')
+				self.setDir('lu')
 			else:
 				self.setDir('u')
 		# Hit top wall
 		if self.getYPos() == self.parentHeight:
 			if 'r' in self.getDir():
-				self.setDir('dr')
+				self.setDir('rd')
 			elif 'l' in self.getDir():
-				self.setDir('dl')
+				self.setDir('ld')
 			else:
 				self.setDir('d')
 		self.move(self.dir)

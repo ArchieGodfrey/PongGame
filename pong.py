@@ -109,10 +109,10 @@ class Pong(object):
 	def handleCollisions(self):
 		# Collisions that require actions
 		if self.collision(self.leftPaddle, self.ball):
-			self.ball.bounce(self.leftPaddle.getYPos() - self.ball.getYPos())
+			self.ball.bounce(self.ball.getYPos() - self.leftPaddle.getYPos())
 			self.leftPaddle.render(None, self.ball.getXPos(), self.ball.getYPos())
 		if self.collision(self.rightPaddle, self.ball):
-			self.ball.bounce(self.rightPaddle.getYPos() - self.ball.getYPos())
+			self.ball.bounce(self.ball.getYPos() - self.rightPaddle.getYPos())
 			self.rightPaddle.render(None, self.ball.getXPos(), self.ball.getYPos())
 		
 		# Collisions that only require re-renders
@@ -124,9 +124,9 @@ class Pong(object):
 			self.net.render(self.ball.getXPos(), self.ball.getYPos())
 
 	def gameFrame(self, move = None):
-		# Render ball before score to remove debounce errors on re-run of function
-		self.ball.render()
+		# Render ball after collisions to remove debounce errors
 		self.handleCollisions()
+		self.ball.render()
 		if move != None and 'l' in move:
 			self.leftPaddle.render(move[1])
 		if move != None and 'r' in move:
