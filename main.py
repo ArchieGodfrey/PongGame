@@ -5,7 +5,7 @@ ControllersConnected = False
 
 def checkControllers():
 	if ControllersConnected:
-		return None
+		return 's'
 	else:
 		tty.setraw(sys.stdin)
 		char = sys.stdin.readline(1)
@@ -42,8 +42,10 @@ def gameLoop(game):
 					response = checkControllers()
 					served = game.serveBall('l', response)
 			if formattedState == 'IncrementRightScore':
-				response = checkControllers()
-				game.serveBall('r', response)
+				served = False
+				while not served:
+					response = checkControllers()
+					served = game.serveBall('r', response)
 			pass
 
 def startGame():

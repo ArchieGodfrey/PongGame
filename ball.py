@@ -39,9 +39,14 @@ class Ball(Sprite):
 		else:
 			self.performDiagMove(dir)
 
-	def bounce(self):
+	def bounce(self, redirect = 1):
 		self.noFlash = True
-		self.setDir(self.bouncePhysics[self.getDir()])
+		direction = {
+		   0 : 'u',
+		   1 : '',
+		   2 : 'd',
+		}
+		self.setDir(self.bouncePhysics[direction[redirect]] + self.bouncePhysics[self.getDir()[0]])
 
 	def checkBoundary(self):
 		# Specification requires no bounce 4 columns in from each horizontal boundary
