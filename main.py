@@ -18,12 +18,12 @@ def checkControllers():
 		if char == 'l':
 			return 'rd'
 		if char == 'd':
-			return 's'
+			return 'ss'
 		if char == 'k':
-			return 's'
+			return 'ss'
 		if char == 'c':
 			raise Exception('Quit')
-		pass
+		checkControllers()
 
 def gameLoop(game):
 	while True:
@@ -32,25 +32,21 @@ def gameLoop(game):
 			response = checkControllers()
 		except Exception as state:
 			break
-		try:
-			game.gameFrame(response)
-		except Exception as state:
-			formattedState = str(state)
-			if formattedState == 'IncrementLeftScore':
-				served = False
-				while not served:
-					response = checkControllers()
-					served = game.serveBall('l', response)
-			if formattedState == 'IncrementRightScore':
-				served = False
-				while not served:
-					response = checkControllers()
-					served = game.serveBall('r', response)
-			pass
+		state = game.gameFrame(response)
+		formattedState = str(state)
+		if 'serve' in formattedState:
+			served = False
+			while not served:
+				response = checkControllers()
+				served = game.serveBall(state[0], response)
 
 def startGame():
 	game = Pong(80,24)
 	game.setupGame()
+	served = False
+	while not served:
+		response = checkControllers()
+		served = game.serveBall(game.getServeSide(), response)
 	gameLoop(game)
 
 
