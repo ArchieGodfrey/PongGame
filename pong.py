@@ -72,9 +72,10 @@ class Pong(object):
 		paddle = self.leftPaddle if side == 'l' else self.rightPaddle
 		if 'l' in side and not 'r' in response:
 			paddle = self.leftPaddle
+			paddle.render(response[1])
 		if 'r' in side and not 'l' in response:
 			paddle = self.rightPaddle
-		paddle.render(response[1])
+			paddle.render(response[1])
 		opposite = 'r' if side == 'l' else 'l'
 		self.ball.setDir(opposite)
 		offset = self.ball.getWidth() if paddle.getXPos() < int(self.width / 2) else (-self.ball.getWidth())
@@ -121,6 +122,7 @@ class Pong(object):
 		if self.collision(self.rightScore, self.ball, 1, 1):
 			self.rightScore.render(self.ball.getXPos(), self.ball.getYPos())
 		if self.collision(self.net, self.ball, 0, self.height):
+			self.ball.setNoFlash(True)
 			self.net.render(self.ball.getXPos(), self.ball.getYPos())
 
 	def gameFrame(self, move = None):
