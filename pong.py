@@ -2,7 +2,7 @@ from ball import Ball
 from paddle import Paddle
 from score import Score
 from net import Net
-import sys, time 
+import sys, time, random 
 
 UpCode = lambda n: (u"\u001b[" + str(n) + "A")
 DownCode = lambda n: (u"\u001b[" + str(n) + "B")
@@ -25,7 +25,9 @@ class Pong(object):
 		self.left = 0
 		self.right = width
 
-		self.ball = Ball(Red, 1, 1, self.width, self.height, 'ur')	
+		startDir = 'r' if random.randint(0,1) > 0 else 'l'
+		startAngle = 'u' if random.randint(0,1) > 0 else 'd'
+		self.ball = Ball(Red, 1, 1, self.width, self.height, 'r')	# startDir + startAngle
 		self.leftPaddle = Paddle(White, 1, 3, self.width, self.height)
 		self.rightPaddle = Paddle(White, 1, 3, self.width, self.height)
 
@@ -39,12 +41,12 @@ class Pong(object):
 			i=+1
 
 	def initPositions(self):
-		self.leftPaddle.setXYPos(2, int(self.height / 2))
-		self.rightPaddle.setXYPos(self.width - 2, int(self.height / 2))
+		self.leftPaddle.setXYPos(3, int(self.height / 2))
+		self.rightPaddle.setXYPos(self.width - 3, int(self.height / 2))
 		self.leftScore.setXYPos(int(self.width / 2) - 10, self.height - 8)
 		self.rightScore.setXYPos(int(self.width / 2) + 10, self.height - 8)
 		self.net.setXYPos(int(self.width / 2), 0)
-		self.ball.setXYPos(10, int(self.height / 2) - 1)
+		self.ball.setXYPos(int(self.width / 2), int(self.height / 2))
 
 	def incrementScore(self):
 		# Hit left wall
@@ -60,16 +62,17 @@ class Pong(object):
 		return None
 
 	def serveBall(self, side, response):
-		if 'l' in response:
-			self.leftPaddle.render(response[1])
-			self.ball.setDir('r')
-			self.ball.prepareServe(self.leftPaddle.getXPos() + self.ball.getWidth(), self.leftPaddle.getYPos() + int(self.leftPaddle.getHeight() / 2))
-		if 'r' in response:
-			self.rightPaddle.render(response[1])
-			self.ball.setDir('l')
-			self.ball.prepareServe(self.rightPaddle.getXPos() - self.ball.getWidth(), self.rightPaddle.getYPos() + int(self.rightPaddle.getHeight() / 2))
 		if response == 's':
 			return True
+		paddle = None
+		if 'l' in side and not 'r' in response:
+			paddle = self.leftPaddle
+		if 'r' in side and not 'l' in response:
+			paddle = self.rightPaddle
+		if paddle != None:
+			paddle.render(response[1])
+			self.ball.setDir('r')
+			self.ball.prepareServe(self.leftPaddle.getXPos() + self.ball.getWidth(), self.leftPaddle.getYPos() + int(self.leftPaddle.getHeight() / 2))
 		return False
 
 	def collision(self, a, b, extraX = 0, extraY = 0):
@@ -93,14 +96,15 @@ class Pong(object):
 		self.net.render()
 		self.leftPaddle.render()
 		self.rightPaddle.render()
+		self.ball.setNoFlash(True)
 
 	def handleCollisions(self):
 		# Collisions that require actions
 		if self.collision(self.leftPaddle, self.ball):
-			self.ball.bounce()
+			self.ball.bounce(self.leftPaddle.getYPos() - self.ball.getYPos())
 			self.leftPaddle.render(None, self.ball.getXPos(), self.ball.getYPos())
 		if self.collision(self.rightPaddle, self.ball):
-			self.ball.bounce()
+			self.ball.bounce(self.rightPaddle.getYPos() - self.ball.getYPos())
 			self.rightPaddle.render(None, self.ball.getXPos(), self.ball.getYPos())
 		
 		# Collisions that only require re-renders
@@ -109,13 +113,12 @@ class Pong(object):
 		if self.collision(self.rightScore, self.ball, 1, 1):
 			self.rightScore.render(self.ball.getXPos(), self.ball.getYPos())
 		if self.collision(self.net, self.ball, 0, self.height):
-			self.ball.setNoFlash(True)
-			self.net.render()
+			self.net.render(self.ball.getXPos(), self.ball.getYPos())
 
 	def gameFrame(self, move = None):
 		# Render ball before score to remove debounce errors on re-run of function
-		self.handleCollisions()
 		self.ball.render()
+		self.handleCollisions()
 		score = self.incrementScore()
 		if score != None:
 			raise Exception(score)
