@@ -18,9 +18,9 @@ def checkControllers():
 		if char == 'l':
 			return 'rd'
 		if char == 'd':
-			return 'ss'
+			return 'ls'
 		if char == 'k':
-			return 'ss'
+			return 'rs'
 		if char == 'c':
 			raise Exception('Quit')
 		checkControllers()

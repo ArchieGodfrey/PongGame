@@ -80,7 +80,7 @@ class Pong(object):
 		self.ball.setDir(opposite)
 		offset = self.ball.getWidth() if paddle.getXPos() < int(self.width / 2) else (-self.ball.getWidth())
 		self.ball.prepareServe(paddle.getXPos() + offset, paddle.getYPos() + int(paddle.getHeight() / 2))
-		if 's' in response:
+		if 's' in response and side in response:
 			return True
 		return False
 
