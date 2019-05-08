@@ -1,3 +1,4 @@
+from sprite import Sprite
 from ball import Ball
 from paddle import Paddle
 from score import Score
@@ -46,6 +47,11 @@ class Pong(object):
 		relative = int((self.ball.getXPos()) / 10)
 		return 2**relative
 
+	def displayWinner(self, side):
+		message = "The winner is" + "Left Side!" if side == 'l' else "Right Side!"
+		text = Sprite(White, 0, 0)
+		text.printToConsole(int(self.width / 2) - int(len(message) / 2), int(self.height / 2), message, self.width, self.height)
+
 	def initPositions(self):
 		self.leftPaddle.setXYPos(3, int(self.height / 2))
 		self.rightPaddle.setXYPos(self.width - 3, int(self.height / 2))
@@ -67,6 +73,10 @@ class Pong(object):
 			self.rightScore.render()
 			increment = True
 		if increment:
+			if self.leftScore.getScore() == 10:
+				return 'lwinner'
+			if self.rightScore.getScore() == 10:
+				return 'rwinner'
 			swap = True if (self.rightScore.getScore() + self.leftScore.getScore()) % 5 == 0 else False
 			self.serve = 'r' if self.serve == 'l' and swap else 'l'
 			return self.serve + 'serve'

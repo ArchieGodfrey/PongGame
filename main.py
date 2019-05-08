@@ -72,6 +72,9 @@ def gameLoop(game):
 		if 'serve' in formattedState:
 			serve(game, state[0])
 
+		if 'winner' in formattedState:
+			game.displayWinner(state[0])
+
 def startGame():
 	game = Pong(80,24)
 	game.setupGame()
