@@ -22,10 +22,10 @@ class Pong(object):
 		self.height = height
 		self.top = height
 		self.bottom = 0
-		self.left = 0
-		self.right = width
-		self.serve = 'r' if random.randint(0,1) > 0 else 'l'
+		self.leftPaddleSuper = False
+		self.rightPaddleSuper = False
 
+		self.serve = 'r' if random.randint(0,1) > 0 else 'l'
 		self.ball = Ball(Red, 1, 1, self.width, self.height, self.serve)
 		self.leftPaddle = Paddle(White, 1, 3, self.width, self.height)
 		self.rightPaddle = Paddle(White, 1, 3, self.width, self.height)
@@ -71,6 +71,13 @@ class Pong(object):
 			self.serve = 'r' if self.serve == 'l' and swap else 'l'
 			return self.serve + 'serve'
 		return None
+
+	def toggleSuper(self, side):
+		if side != None:
+			paddle = self.leftPaddle if side == 'l' else self.rightPaddle
+			toggle = self.leftPaddleSuper if side == 'l' else self.rightPaddleSuper
+			toggle = 15 if toggle == 0 else (toggle - 0.05)
+			paddle.setHeight(5) if toggle > 0 else paddle.setHeight(3)
 
 	def serveBall(self, side, response = None):
 		paddle = self.leftPaddle if side == 'l' else self.rightPaddle
@@ -134,7 +141,10 @@ class Pong(object):
 		# Render ball after collisions to remove debounce errors
 		self.handleCollisions()
 		self.ball.render()
-		print(move, move[1:])
+		if self.leftPaddleSuper > 0:
+			self.toggleSuper('l')
+		if self.rightPaddleSuper > 0:
+			self.toggleSuper('r')
 		if move != None and 'l' in move:
 			self.leftPaddle.render(move[1:])
 		if move != None and 'r' in move:

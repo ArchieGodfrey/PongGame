@@ -65,6 +65,10 @@ def gameLoop(game):
 		state = game.gameFrame(response)
 		formattedState = str(state)
 		Ports.sendToLEDS(game.getBallBinPos())
+
+		if 'super' in response:
+			game.toggleSuper(response[0])	
+
 		if 'serve' in formattedState:
 			serve(game, state[0])
 

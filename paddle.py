@@ -12,6 +12,10 @@ class Paddle(Sprite):
     def __str__(self):
         return str(" " * self.width)
 
+    def setHeight(self, height):
+        if height !== self.height:
+            self.height = height
+
     def move(self, dir):
         if 'd' in dir or 'u' in dir:
             if (self.getYPos() > int(self.height / 2)) and not 'u' in dir:
