@@ -1,4 +1,4 @@
-from serialPort import openPort
+from ports import openScreen
 import sys, time 
 
 UpCode = lambda n: (u"\u001b[" + str(n) + "A")
@@ -10,7 +10,7 @@ RightDownCode = lambda x, y: (u"\u001b[" + str(x) + "C\u001b[" + str(y) + "A")
 
 Reset = u"\u001b[0m"
 
-WriteToPort = False
+WriteToPort = True
 
 class Sprite(object):
 
@@ -23,7 +23,7 @@ class Sprite(object):
         self.yPos = 0
 
         if WriteToPort:
-            self.serialPort = openPort()
+            self.serialPort = openScreen()
 
     def getColor(self):
         return self.color

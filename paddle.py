@@ -20,6 +20,13 @@ class Paddle(Sprite):
             if (self.getYPos() < self.parentHeight - self.height) and not 'd' in dir:
                 self.dir = dir
                 self.performMove(dir)
+	elif len(dir) > 1 and self.getYPos() - dir != 0:
+		for i in range(self.getYPos(), int(dir[1:])):
+			self.performMove(dir)
+		if self.getYPos() - dir > 0:
+			self.dir = 'u'
+		else:
+			self.dir = 'd'
 
     def render(self, dir = None, x = None, y = None):
         if (x != None and y != None):

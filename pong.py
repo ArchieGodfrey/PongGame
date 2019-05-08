@@ -42,6 +42,10 @@ class Pong(object):
 	def getServeSide(self):
 		return self.serve
 
+	def getBallBinPos(self):
+		relative = int((self.ball.getXPos()) / 10)
+		return 2**relative
+
 	def initPositions(self):
 		self.leftPaddle.setXYPos(3, int(self.height / 2))
 		self.rightPaddle.setXYPos(self.width - 3, int(self.height / 2))
@@ -68,19 +72,20 @@ class Pong(object):
 			return self.serve + 'serve'
 		return None
 
-	def serveBall(self, side, response):
+	def serveBall(self, side, response = None):
 		paddle = self.leftPaddle if side == 'l' else self.rightPaddle
-		if 'l' in side and not 'r' in response:
-			paddle = self.leftPaddle
-			paddle.render(response[1])
-		if 'r' in side and not 'l' in response:
-			paddle = self.rightPaddle
-			paddle.render(response[1])
+		if response != None:
+			if 'l' in side and not 'r' in response:
+				paddle = self.leftPaddle
+				paddle.render(response[1])
+			if 'r' in side and not 'l' in response:
+				paddle = self.rightPaddle
+				paddle.render(response[1])
 		opposite = 'r' if side == 'l' else 'l'
 		self.ball.setDir(opposite)
 		offset = self.ball.getWidth() if paddle.getXPos() < int(self.width / 2) else (-self.ball.getWidth())
 		self.ball.prepareServe(paddle.getXPos() + offset, paddle.getYPos() + int(paddle.getHeight() / 2))
-		if 's' in response and side in response:
+		if response != None and 's' in response and side in response:
 			return True
 		return False
 
@@ -105,7 +110,7 @@ class Pong(object):
 		self.net.render()
 		self.leftPaddle.render()
 		self.rightPaddle.render()
-		self.serveBall(self.serve, self.serve + ' ')
+		self.serveBall(self.serve)
 
 	def handleCollisions(self):
 		# Collisions that require actions
@@ -129,10 +134,11 @@ class Pong(object):
 		# Render ball after collisions to remove debounce errors
 		self.handleCollisions()
 		self.ball.render()
+		print(move, move[1:])
 		if move != None and 'l' in move:
-			self.leftPaddle.render(move[1])
+			self.leftPaddle.render(move[1:])
 		if move != None and 'r' in move:
-			self.rightPaddle.render(move[1])
+			self.rightPaddle.render(move[1:])
 		score = self.incrementScore()
 		if score != None:
 			return score

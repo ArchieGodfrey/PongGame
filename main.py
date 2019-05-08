@@ -1,11 +1,24 @@
 from pong import Pong
+import ports as Ports
 import sys, time, tty
 
-ControllersConnected = False
+ControllersConnected = True
+adc = Ports.Adc( 10, 9 )
+
+def convertToPos(data):
+	if data > 15: #Update when changing filter
+		#up	
+		pos = data * (40 / 15)	
+		return pos	
+	else:
+		#down
+		pos = data * (40 / 15)
+		return data
 
 def checkControllers():
 	if ControllersConnected:
-		return 's'
+		print(convertToPos(adc.getOutput()))
+		return 'l' + str(convertToPos(adc.getOutput()))
 	else:
 		tty.setraw(sys.stdin)
 		char = sys.stdin.readline(1)
@@ -23,7 +36,24 @@ def checkControllers():
 			return 'rs'
 		if char == 'c':
 			raise Exception('Quit')
-		checkControllers()
+
+def serve(game, side):
+	served = False
+	currentWait = 0
+	count = 9
+	Ports.sendToDisplay(count)
+	while not served:
+		if currentWait >= 1 and count  > 0:
+			count = count - 1
+			Ports.sendToDisplay(count)
+			currentWait = 0
+		currentWait = currentWait + 0.05
+		response = checkControllers()
+		if response != None:
+			served = game.serveBall(side, side + response)
+		if count == 0:
+			served = game.serveBall(side, game.getServeSide() + 's')
+		time.sleep(0.05)
 
 def gameLoop(game):
 	while True:
@@ -34,19 +64,14 @@ def gameLoop(game):
 			break
 		state = game.gameFrame(response)
 		formattedState = str(state)
+		Ports.sendToLEDS(game.getBallBinPos())
 		if 'serve' in formattedState:
-			served = False
-			while not served:
-				response = checkControllers()
-				served = game.serveBall(state[0], response)
+			serve(game, state[0])
 
 def startGame():
 	game = Pong(80,24)
 	game.setupGame()
-	served = False
-	while not served:
-		response = checkControllers()
-		served = game.serveBall(game.getServeSide(), response)
+	serve(game, game.getServeSide())
 	gameLoop(game)
 
 
