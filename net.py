@@ -13,6 +13,12 @@ class Net(Sprite):
     def __str__(self):
         return str(" " * self.width)
 
+    def checkPixel(self, x, y):
+        for pixel in self.currentPixels:
+            if pixel[0] == x and pixel[1] == y:
+                return True
+        return False
+
     def initalRender(self):
         xPos = self.getXPos()
         yPos = self.getYPos()
@@ -23,7 +29,10 @@ class Net(Sprite):
 
     def render(self, x = None, y = None):
         for pixel in self.currentPixels:
-            if (x != None and y != None) and pixel[1] == y:
-                self.printToConsole(self.getColor(), x, y, self, self.parentWidth, self.parentHeight)
-                return
+            if (x != None and y != None):
+		    if self.checkPixel(x, y):
+		        self.printToConsole(self.getColor(), x, y, self, self.parentWidth, self.parentHeight)
+		    else:
+			self.printToConsole(Reset, x, y, self, self.parentWidth, self.parentHeight)
+            	    return
             self.printToConsole(self.getColor(), pixel[0], pixel[1], self, self.parentWidth, self.parentHeight)
