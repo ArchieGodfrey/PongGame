@@ -16,10 +16,7 @@ class Score(Sprite):
         return self.number
     
     def setScore(self, number):
-        if number < 10:
-            self.number = number
-        else:
-            self.number = 0
+        self.number = number
 
     def addPixel(self, x, y):
         self.currentPixels.append([x, y])
@@ -75,11 +72,12 @@ class Score(Sprite):
 
     def five(self):
         for i in range(0, self.height):
-            self.renderPixel(0,i)
-            self.renderPixel(self.width - 1,i)
+            self.renderPixel(0,i) #Left column
+            self.renderPixel(self.width - 1,i) # Right column
         for i in range(1, self.width - 1):
-            self.renderPixel(i,0)
-            self.renderPixel(i, self.height - 1)
+            self.renderPixel(i,0) #Bottom
+	    self.renderPixel(i, int(self.height / 2)) #Middle
+            self.renderPixel(i, self.height - 1) #Top
 
     def six(self):
         for i in range(0, self.height):
@@ -92,11 +90,8 @@ class Score(Sprite):
 
     def seven(self):
         for i in range(0, self.height):
-            self.renderPixel(0,i)
-            self.renderPixel(self.width - 1,i)
-        for i in range(1, self.width - 1):
-            self.renderPixel(i,0)
-            self.renderPixel(i, self.height - 1)
+            self.renderPixel(self.width - 1,i) # Right column
+        self.renderPixel(int(self.height / 2), self.height) #Middle
     
     def eight(self):
         for i in range(0, self.height):
@@ -116,6 +111,11 @@ class Score(Sprite):
             self.renderPixel(i,int(self.height / 2))
             self.renderPixel(i, self.height - 1)
 
+    def winner(self):
+        self.renderPixel(0,int(self.height / 2))
+	self.renderPixel(int(self.width / 2),0)
+	self.renderPixel(self.width,int(self.height / 2))
+
     def clear(self):
         self.currentPixels = []
         for i in range(0, self.width):
@@ -127,7 +127,9 @@ class Score(Sprite):
         if (x != None and y != None):
             if self.checkPixel(x, y):
                 self.printToConsole(self.getColor(), x, y, self, self.parentWidth, self.parentHeight)
-                return
+	    else:
+		self.printToConsole(Reset, x, y, self, self.parentWidth, self.parentHeight)
+            return
         self.clear()
         options = {
            0 : self.zero,
@@ -140,6 +142,7 @@ class Score(Sprite):
            7 : self.seven,
            8 : self.eight,
            9 : self.nine,
+	  10 : self.winner,
         }
         options[self.number]()
 
