@@ -1,5 +1,4 @@
 from sprite import Sprite
-import sys
 
 Reset = u"\u001b[0m"
 
@@ -29,9 +28,10 @@ class Ball(Sprite):
 		self.noFlash = toggle
 
 	def prepareServe(self, x, y):
-		self.printToConsole(Reset, self.getXPos(), self.getYPos(), self, self.parentWidth, self.parentHeight)
-		self.setXYPos(x, y)
-		self.printToConsole(self.getColor(), self.getXPos(), self.getYPos(), self, self.parentWidth, self.parentHeight)
+		if self.getYPos() != y:
+			self.printToConsole(Reset, self.getXPos(), self.getYPos(), self, self.parentWidth, self.parentHeight)
+			self.setXYPos(x, y)
+			self.printToConsole(self.getColor(), self.getXPos(), self.getYPos(), self, self.parentWidth, self.parentHeight)
 
 	def move(self, dir):
 		self.dir = dir
@@ -42,11 +42,20 @@ class Ball(Sprite):
 
 	def bounce(self, redirect = 1):
 		self.noFlash = True
-		direction = {
-		   0 : 'u',
-		   1 : '',
-		   2 : 'd',
-		}
+		if redirect <= 2:
+			direction = {
+			   0 : 'u',
+			   1 : '',
+			   2 : 'd',
+			}
+		else:
+			direction = {
+			   0 : 'u',
+			   1 : 'u',
+			   2 : '',
+			   3 : 'd',
+			   4 : 'd',
+			}
 		self.setDir(self.bouncePhysics[direction[redirect]] + self.bouncePhysics[self.getDir()[0]])
 
 	def checkBoundary(self):
