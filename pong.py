@@ -3,18 +3,9 @@ from ball import Ball
 from paddle import Paddle
 from score import Score
 from net import Net
+import CONSTANTS as C
+import ports as Ports
 import sys, time, random 
-
-UpCode = lambda n: (u"\u001b[" + str(n) + "A")
-DownCode = lambda n: (u"\u001b[" + str(n) + "B")
-RightCode = lambda n: (u"\u001b[" + str(n) + "C")
-LeftCode = lambda n: (u"\u001b[" + str(n) + "D")
-
-Red = u"\u001b[41m"
-White = u"\u001b[47m"
-Black = u"\u001b[40m"
-Green = u"\u001b[42m"
-Reset = u"\u001b[0m"
 
 class Pong(object):
 
@@ -27,18 +18,13 @@ class Pong(object):
 		self.rightPaddleSuper = False
 
 		self.serve = 'r' if random.randint(0,1) > 0 else 'l'
-		self.ball = Ball(Red, 1, 1, self.width, self.height, self.serve)
-		self.leftPaddle = Paddle(White, 1, 3, self.width, self.height)
-		self.rightPaddle = Paddle(White, 1, 3, self.width, self.height)
+		self.ball = Ball(C.RED, C.BALL_WIDTH, C.BALL_HEIGHT, self.width, self.height, self.serve)
+		self.leftPaddle = Paddle(C.WHITE, C.PADDLE_WIDTH, C.PADDLE_HEIGHT, self.width, self.height)
+		self.rightPaddle = Paddle(C.WHITE, C.PADDLE_WIDTH, C.PADDLE_HEIGHT, self.width, self.height)
 
-		self.leftScore = Score(White, 3, 5, self.width, self.height, 0)
-		self.rightScore = Score(White, 3, 5, self.width, self.height, 0)
-		self.net = Net(Green, 1, 2, self.width, self.height)
-
-		sys.stdout.flush()
-		for i in range(0, self.height):
-			sys.stdout.write('\n')
-			i=+1
+		self.leftScore = Score(C.YELLOW, C.SCORE_WIDTH, C.SCORE_HEIGHT, self.width, self.height, 0)
+		self.rightScore = Score(C.YELLOW, C.SCORE_WIDTH, C.SCORE_HEIGHT, self.width, self.height, 0)
+		self.net = Net(C.GREEN, C.NET_WIDTH, C.NET_HEIGHT, self.width, self.height)
 
 	def getServeSide(self):
 		return self.serve
@@ -48,15 +34,15 @@ class Pong(object):
 		return 2**relative
 
 	def displayWinner(self, side):
-		message = "The winner is" + "Left Side!" if side == 'l' else "Right Side!"
-		text = Sprite(White, 0, 0)
-		text.printToConsole(int(self.width / 2) - int(len(message) / 2), int(self.height / 2), message, self.width, self.height)
+		message = "The winner is " + "Left Side!" if side == 'l' else "Right Side!"
+		text = Sprite(C.WHITE, 0, 0)
+		text.printToConsole(text.getColor(), int(self.width / 2) - int(len(message) / 2), int(self.height / 2), message, self.width, self.height)
 
 	def initPositions(self):
-		self.leftPaddle.setXYPos(3, int(self.height / 2))
-		self.rightPaddle.setXYPos(self.width - 3, int(self.height / 2))
-		self.leftScore.setXYPos(int(self.width / 2) - 10, self.height - 8)
-		self.rightScore.setXYPos(int(self.width / 2) + 10, self.height - 8)
+		self.leftPaddle.setXYPos(C.PADDLE_X, int(self.height / 2))
+		self.rightPaddle.setXYPos(self.width - C.PADDLE_X, int(self.height / 2))
+		self.leftScore.setXYPos(int(self.width / 2) - self.leftScore.getWidth() - C.LEFT_SCORE_X, self.height - 8)
+		self.rightScore.setXYPos(int(self.width / 2) + self.rightScore.getWidth() + C.RIGHT_SCORE_X, self.height - 8)
 		self.net.setXYPos(int(self.width / 2), 0)
 		self.ball.setXYPos(int(self.width / 2), int(self.height / 2))
 
@@ -73,6 +59,7 @@ class Pong(object):
 			self.rightScore.render()
 			increment = True
 		if increment:
+			Ports.sendToBuzzer(1000)
 			if self.leftScore.getScore() == 10:
 				return 'lwinner'
 			if self.rightScore.getScore() == 10:
@@ -86,18 +73,19 @@ class Pong(object):
 		if side != None:
 			paddle = self.leftPaddle if side == 'l' else self.rightPaddle
 			toggle = self.leftPaddleSuper if side == 'l' else self.rightPaddleSuper
-			toggle = 15 if toggle == 0 else (toggle - 0.05)
+			toggle = 15 if toggle == 0 else (toggle - C.FRAME_RATE)
 			paddle.setHeight(5) if toggle > 0 else paddle.setHeight(3)
+		sys.stdout.write(C.LEFTCODE(1000) + C.UPCODE(18) + 'Left Super: ' + str(self.leftPaddleSuper))
+		sys.stdout.write(C.LEFTCODE(1000) + C.UPCODE(19) + 'Right Super: ' + str(self.rightPaddleSuper))
+		sys.stdout.write(C.DOWNCODE(C.TERMINAL_HEIGHT) + C.LEFTCODE(C.TERMINAL_WIDTH))
 
 	def serveBall(self, side, response = None):
 		paddle = self.leftPaddle if side == 'l' else self.rightPaddle
 		if response != None:
 			if 'l' in side and not 'r' in response:
-				paddle = self.leftPaddle
-				paddle.render(response[1])
+				paddle.render(response[1:])
 			if 'r' in side and not 'l' in response:
-				paddle = self.rightPaddle
-				paddle.render(response[1])
+				paddle.render(response[1:])
 		opposite = 'r' if side == 'l' else 'l'
 		self.ball.setDir(opposite)
 		offset = self.ball.getWidth() if paddle.getXPos() < int(self.width / 2) else (-self.ball.getWidth())
@@ -130,24 +118,36 @@ class Pong(object):
 		self.serveBall(self.serve)
 
 	def handleCollisions(self):
+		debug = ''	
+		sys.stdout.write(C.LEFTCODE(1000) + C.UPCODE(23) + '                                ')
 		# Collisions that require actions
 		if self.collision(self.leftPaddle, self.ball):
 			self.ball.bounce(self.ball.getYPos() - self.leftPaddle.getYPos())
 			self.leftPaddle.render(None, self.ball.getXPos(), self.ball.getYPos())
+			debug=('Left paddle hit ball ')
 		if self.collision(self.rightPaddle, self.ball):
 			self.ball.bounce(self.ball.getYPos() - self.rightPaddle.getYPos())
 			self.rightPaddle.render(None, self.ball.getXPos(), self.ball.getYPos())
+			debug=('Right paddle hit ball')
 		
 		# Collisions that only require re-renders
-		if self.collision(self.leftScore, self.ball, 1, 1):
+		if self.collision(self.leftScore, self.ball):
+			self.ball.setNoFlash(True)
 			self.leftScore.render(self.ball.getXPos(), self.ball.getYPos())
-		if self.collision(self.rightScore, self.ball, 1, 1):
+			debug=('Left score with ball ')
+		if self.collision(self.rightScore, self.ball):
+			self.ball.setNoFlash(True)
 			self.rightScore.render(self.ball.getXPos(), self.ball.getYPos())
+			debug=('Right score with ball')
 		if self.collision(self.net, self.ball, 0, self.height):
 			self.ball.setNoFlash(True)
 			self.net.render(self.ball.getXPos(), self.ball.getYPos())
+			debug=('Ball crossed the net ')
+			
+		sys.stdout.write(C.LEFTCODE(1000) + C.UPCODE(23) + 'Collisions: ' + debug)
+		sys.stdout.write(C.DOWNCODE(C.TERMINAL_HEIGHT) + C.LEFTCODE(C.TERMINAL_WIDTH))
 
-	def gameFrame(self, move = None):
+	def gameFrame(self, leftMove = None, rightMove = None):
 		# Render ball after collisions to remove debounce errors
 		self.handleCollisions()
 		self.ball.render()
@@ -155,10 +155,10 @@ class Pong(object):
 			self.toggleSuper('l')
 		if self.rightPaddleSuper > 0:
 			self.toggleSuper('r')
-		if move != None and 'l' in move:
-			self.leftPaddle.render(move[1:])
-		if move != None and 'r' in move:
-			self.rightPaddle.render(move[1:])
+		if leftMove != None:
+			self.leftPaddle.render(leftMove[1:])
+		if rightMove != None:
+			self.rightPaddle.render(rightMove[1:])
 		score = self.incrementScore()
 		if score != None:
 			return score
