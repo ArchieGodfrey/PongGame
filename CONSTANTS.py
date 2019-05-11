@@ -1,0 +1,80 @@
+#PORTS
+
+ADC_INPUT = 10
+ADC_OUTPUT = 9
+SERVE_INPUT = 17
+SUPER_INPUT = 23
+ADC_REFRESH_RATE = 0.0000
+
+SOFTWARE_ADC_INPUT = 0x21
+SOFTWARE_SERVE_INPUT = 11
+SOFTWARE_SUPER_INPUT = 18
+
+LEDS_OUTPUT = 0x38
+
+SEGMENT_DISPLAY_OUTPUT = 0x24 #0x38
+
+BUZZER_OUTPUT = 18
+
+SERIAL_OUTPUT = str("/dev/ttyAMA0")
+SERIAL_RATE = 115200
+
+PI_EIGHT_PORTS = { 
+	1 : 5,
+	2 : 6,
+	4 : 12,
+	8 : 13,
+	16 : 16,
+	32 : 19,
+	64 : 20,
+	128 : 26,
+	256 : 26,
+}	
+
+#Booleans
+
+CONTROLLERS_CONNECTED = True
+SERIAL_PORT_CONNECTED = True
+HARDWARE_DEBUG = True
+
+
+#Game Variables
+
+FRAME_SPEED = 0.005
+HARDWARE_RATE = 0.1
+TERMINAL_WIDTH = 80
+TERMINAL_HEIGHT = 24
+
+#Sprite Sizes
+BALL_WIDTH = 1
+BALL_HEIGHT = 1
+
+PADDLE_WIDTH = 1
+PADDLE_HEIGHT = 3
+
+SCORE_WIDTH = 3
+SCORE_HEIGHT = 5
+
+NET_WIDTH = 1
+NET_HEIGHT = 2
+
+#Starting Positions
+
+PADDLE_X = 4
+LEFT_SCORE_X = 5
+RIGHT_SCORE_X = 3
+
+
+#Colours
+RED = u"\u001b[41m"
+WHITE = u"\u001b[47m"
+BLACK = u"\u001b[40m"
+GREEN = u"\u001b[42m"
+YELLOW = u"\u001b[43m"
+RESET = u"\u001b[0m"
+
+#Escape Codes
+UPCODE = lambda n: (u"\u001b[" + str(n) + "A")
+DOWNCODE = lambda n: (u"\u001b[" + str(n) + "B")
+RIGHTCODE = lambda n: (u"\u001b[" + str(n) + "C")
+LEFTCODE = lambda n: (u"\u001b[" + str(n) + "D")
