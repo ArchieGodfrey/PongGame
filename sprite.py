@@ -1,16 +1,6 @@
-from ports import openScreen
+import ports as Ports
 import sys, time 
-
-UpCode = lambda n: (u"\u001b[" + str(n) + "A")
-DownCode = lambda n: (u"\u001b[" + str(n) + "B")
-RightCode = lambda n: (u"\u001b[" + str(n) + "C")
-LeftCode = lambda n: (u"\u001b[" + str(n) + "D")
-
-RightDownCode = lambda x, y: (u"\u001b[" + str(x) + "C\u001b[" + str(y) + "A")
-
-Reset = u"\u001b[0m"
-
-WriteToPort = True
+import CONSTANTS as C
 
 class Sprite(object):
 
@@ -22,8 +12,8 @@ class Sprite(object):
         self.xPos = 0
         self.yPos = 0
 
-        if WriteToPort:
-            self.serialPort = openScreen()
+        if C.SERIAL_PORT_CONNECTED:
+            self.serialPort = Ports.openScreen()
 
     def getColor(self):
         return self.color
@@ -91,10 +81,10 @@ class Sprite(object):
                 self.verticalMove('d')
 
     def printToConsole(self, color, x, y, message, screenWidth, screenHeight):
-	if WriteToPort:
-		self.serialPort.write(str(color + RightCode(x) + UpCode(y) + str(message)) + DownCode(screenHeight) + LeftCode(screenWidth))
+	if C.SERIAL_PORT_CONNECTED:
+		Ports.sendToSerial(self.serialPort, str(C.RIGHTCODE(x) + C.UPCODE(y) + color + str(message)) + C.DOWNCODE(screenHeight) + C.LEFTCODE(screenWidth) + C.RESET)
 	else:	
-		sys.stdout.write(color + RightCode(x) + UpCode(y) + str(message) + Reset)
-		sys.stdout.write(DownCode(screenHeight) + LeftCode(screenWidth))
+		sys.stdout.write(color + C.RIGHTCODE(x) + C.UPCODE(y) + str(message) + C.RESET)
+		sys.stdout.write(C.DOWNCODE(screenHeight) + C.LEFTCODE(screenWidth))
 		sys.stdout.flush()
 
