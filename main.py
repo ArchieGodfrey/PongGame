@@ -1,41 +1,28 @@
 from pong import Pong
+import CONSTANTS as C
 import ports as Ports
 import sys, time, tty
 
-ControllersConnected = True
-adc = Ports.Adc( 10, 9 )
+leftController = Ports.HardwareController( C.ADC_INPUT, C.ADC_OUTPUT, C.SERVE_INPUT, C.SUPER_INPUT )
+rightController = Ports.SoftwareController( C.SOFTWARE_ADC_INPUT, C.SOFTWARE_SERVE_INPUT, C.SOFTWARE_SUPER_INPUT )
 
 def convertToPos(data):
-	if data > 15: #Update when changing filter
-		#up	
-		pos = data * (40 / 15)	
-		return pos	
-	else:
-		#down
-		pos = data * (40 / 15)
-		return data
+	pos = C.TERMINAL_HEIGHT - data
+	if pos < C.PADDLE_HEIGHT:
+		return 0
+	if pos > C.TERMINAL_HEIGHT - C.PADDLE_HEIGHT:
+		return C.TERMINAL_HEIGHT - C.PADDLE_HEIGHT
+	return pos
 
-def checkControllers():
-	if ControllersConnected:
-		print(convertToPos(adc.getOutput()))
-		return 'l' + str(convertToPos(adc.getOutput()))
+def checkControllers(game, side):
+	controller = leftController if side == 'l' else rightController
+	response = controller.getResponse()
+	if 'serve' in response:
+		return side + 'serve'
+	elif 'super' in response:
+		return side + 'super'
 	else:
-		tty.setraw(sys.stdin)
-		char = sys.stdin.readline(1)
-		if char == 'w':
-			return 'lu'
-		if char == 's':
-			return 'ld'
-		if char == 'o':
-			return 'ru'
-		if char == 'l':
-			return 'rd'
-		if char == 'd':
-			return 'ls'
-		if char == 'k':
-			return 'rs'
-		if char == 'c':
-			raise Exception('Quit')
+		return side + str(convertToPos(controller.getOutput()))
 
 def serve(game, side):
 	served = False
@@ -47,37 +34,51 @@ def serve(game, side):
 			count = count - 1
 			Ports.sendToDisplay(count)
 			currentWait = 0
-		currentWait = currentWait + 0.05
-		response = checkControllers()
-		if response != None:
-			served = game.serveBall(side, side + response)
+		currentWait = currentWait + C.HARDWARE_RATE
+		leftResponse = checkControllers(game, 'l')
+		rightResponse = checkControllers(game, 'r')
+		if leftResponse != None and 'l' in side:
+			served = game.serveBall(side, leftResponse)
+		if ('serve' in leftResponse and 'l' in side):
+			served = game.serveBall(side, 'l' + 'serve')
+		if rightResponse != None and 'r' in side:
+			served = game.serveBall(side, rightResponse)
+		if ('serve' in rightResponse and 'r' in side):
+			served = game.serveBall(side, 'r' + 'serve')
 		if count == 0:
-			served = game.serveBall(side, game.getServeSide() + 's')
-		time.sleep(0.05)
+			served = game.serveBall(side, game.getServeSide() + 'serve')
+
 
 def gameLoop(game):
-	while True:
-		time.sleep(0.05)
-		try:
-			response = checkControllers()
-		except Exception as state:
-			break
-		state = game.gameFrame(response)
+	play = True
+	while play:
+		time.sleep(C.FRAME_SPEED)
+		leftResponse = checkControllers(game, 'l')
+		rightResponse = checkControllers(game, 'r')
+		state = game.gameFrame(leftResponse, rightResponse)
 		formattedState = str(state)
 		Ports.sendToLEDS(game.getBallBinPos())
-
-		if 'super' in response:
-			game.toggleSuper(response[0])	
-
+		
+		if 'super' in leftResponse:
+			game.toggleSuper('l')	
+		if 'super' in rightResponse:
+			game.toggleSuper('r')
 		if 'serve' in formattedState:
+			Ports.pointGlow(state[0])
 			serve(game, state[0])
 
 		if 'winner' in formattedState:
 			game.displayWinner(state[0])
+			play = False
 
 def startGame():
-	game = Pong(80,24)
+	sys.stdout.flush()
+	for i in range(0, C.TERMINAL_HEIGHT):
+		sys.stdout.write('\n')
+		i=+1
+	game = Pong(C.TERMINAL_WIDTH, C.TERMINAL_HEIGHT)
 	game.setupGame()
+	Ports.setupPiLEDS()
 	serve(game, game.getServeSide())
 	gameLoop(game)
 
