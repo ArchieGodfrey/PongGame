@@ -76,7 +76,7 @@ class Score(Sprite):
             self.renderPixel(self.width - 1,i) # Right column
         for i in range(1, self.width - 1):
             self.renderPixel(i,0) #Bottom
-	    self.renderPixel(i, int(self.height / 2)) #Middle
+	        self.renderPixel(i, int(self.height / 2)) #Middle
             self.renderPixel(i, self.height - 1) #Top
 
     def six(self):
@@ -91,7 +91,7 @@ class Score(Sprite):
     def seven(self):
         for i in range(0, self.height):
             self.renderPixel(self.width - 1,i) # Right column
-        self.renderPixel(int(self.height / 2), self.height) #Middle
+        self.renderPixel(int(self.height / 2), self.height - 1) #Top
     
     def eight(self):
         for i in range(0, self.height):
@@ -113,8 +113,8 @@ class Score(Sprite):
 
     def winner(self):
         self.renderPixel(0,int(self.height / 2))
-	self.renderPixel(int(self.width / 2),0)
-	self.renderPixel(self.width,int(self.height / 2))
+        self.renderPixel(int(self.width / 2),0)
+        self.renderPixel(self.width,int(self.height / 2))
 
     def clear(self):
         self.currentPixels = []
@@ -127,8 +127,8 @@ class Score(Sprite):
         if (x != None and y != None):
             if self.checkPixel(x, y):
                 self.printToConsole(self.getColor(), x, y, self, self.parentWidth, self.parentHeight)
-	    else:
-		self.printToConsole(Reset, x, y, self, self.parentWidth, self.parentHeight)
+            else:
+                self.printToConsole(Reset, x, y, self, self.parentWidth, self.parentHeight)
             return
         self.clear()
         options = {
@@ -142,7 +142,7 @@ class Score(Sprite):
            7 : self.seven,
            8 : self.eight,
            9 : self.nine,
-	  10 : self.winner,
+	       10 : self.winner,
         }
         options[self.number]()
 
