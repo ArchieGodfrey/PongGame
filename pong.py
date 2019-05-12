@@ -34,7 +34,7 @@ class Pong(object):
 		return 2**relative
 
 	def displayWinner(self, side):
-		message = "The winner is " + "Left Side!" if side == 'l' else "Right Side!"
+		message = "The winner is Left Side!" if side == 'l' else "The winner is Right Side!"
 		text = Sprite(C.WHITE, 0, 0)
 		text.printToConsole(text.getColor(), int(self.width / 2) - int(len(message) / 2), int(self.height / 2), message, self.width, self.height)
 

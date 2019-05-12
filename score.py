@@ -31,98 +31,52 @@ class Score(Sprite):
         self.addPixel(self.getXPos() + x, self.getYPos() + y)
         self.printToConsole(self.getColor(), self.getXPos() + x, self.getYPos() + y, self, self.parentWidth, self.parentHeight)
 
-    def zero(self):
-        for i in range(0, self.height):
-            self.renderPixel(0,i)
-            self.renderPixel(self.width - 1,i)
-        for i in range(1, self.width - 1):
-            self.renderPixel(i,0)
-            self.renderPixel(i, self.height - 1)
-    
-    def one(self):
-        for i in range(0, self.height):
-            self.renderPixel(self.width - 1,i)
-    
-    def two(self):
-        for i in range(0, self.height):
-            if i < int(self.height / 2):
-                self.renderPixel(0,i)
-            
-        for i in range(0, self.width):
-            self.renderPixel(i,0)
-            self.renderPixel(i, int(self.height / 2))
-            self.renderPixel(i, self.height - 1)
+    def renderNumber(self, draw):
+
+        validPos = [
+            'top', 'middle', 'bottom', 'left', 'center', 'right'
+        ]
+
+        convertPos = {
+            'top' : 'v' + str(self.getHeight() - 1),
+            'middle' : 'v' + str(int(self.getHeight() / 2)),
+            'bottom': 'v0',
+            'left': 'h0',
+            'center': 'h' + str(int(self.getWidth() / 2)),
+            'right': 'h' + str(self.getWidth() - 1),
+        }
         
-    
-    def three(self):
-        for i in range(0, self.height):
-            self.renderPixel(self.width - 1,i)
-        for i in range(0, self.width - 1):
-            self.renderPixel(i,0)
-            self.renderPixel(i, int(self.height / 2))
-            self.renderPixel(i, self.height - 1)
+        def processInput(pos, path):
+            index = draw.index(pos) + len(pos)
+            val = draw[index:index + 2]
+            if val != ' ' and val != '':
+                return [convertPos[pos][0], int(val)]
 
-    def four(self):
-        for i in range(0, self.height):
-            self.renderPixel(self.width - 1,i)
-        for i in range(int(self.height / 2), self.height):
-            self.renderPixel(0,i)
-        for i in range(1, self.width - 1):
-            self.renderPixel(i,int(self.height / 2))
-
-    def five(self):
-        for i in range(0, self.height):
-            self.renderPixel(0,i) #Left column
-            self.renderPixel(self.width - 1,i) # Right column
-        for i in range(1, self.width - 1):
-            self.renderPixel(i,0) #Bottom
-	        self.renderPixel(i, int(self.height / 2)) #Middle
-            self.renderPixel(i, self.height - 1) #Top
-
-    def six(self):
-        for i in range(0, self.height):
-            if i < int(self.height / 2):
-                self.renderPixel(0,i)
-        for i in range(0, self.width):
-            self.renderPixel(i,0)
-            self.renderPixel(i, int(self.height / 2))
-            self.renderPixel(i, self.height - 1)
-
-    def seven(self):
-        for i in range(0, self.height):
-            self.renderPixel(self.width - 1,i) # Right column
-        self.renderPixel(int(self.height / 2), self.height - 1) #Top
-    
-    def eight(self):
-        for i in range(0, self.height):
-            self.renderPixel(0,i)
-            self.renderPixel(self.width - 1,i)
-        for i in range(1, self.width - 1):
-            self.renderPixel(i,0)
-            self.renderPixel(i, int(self.height / 2))
-            self.renderPixel(i, self.height - 1)
-
-    def nine(self):
-        for i in range(0, self.height):
-            self.renderPixel(self.width - 1,i)
-        for i in range(int(self.height / 2), self.height):
-            self.renderPixel(0,i)
-        for i in range(1, self.width - 1):
-            self.renderPixel(i,int(self.height / 2))
-            self.renderPixel(i, self.height - 1)
-
-    def winner(self):
-        self.renderPixel(0,int(self.height / 2))
-        self.renderPixel(int(self.width / 2),0)
-        self.renderPixel(self.width,int(self.height / 2))
+        for pos in validPos:
+            if pos in draw:
+                start = int(convertPos[pos][1:])
+                path = processInput(pos, draw)
+                if path[1] > 0:
+                    if 'v' in path[0]:
+                        for i in range(path[1]):
+                            self.renderPixel(i, start)
+                    else:
+                        for i in range(path[1]):
+                            self.renderPixel(start, i)
+                else:
+                    if 'v' in path[0]:
+                        for i in range(-path[1]):
+                            self.renderPixel(i - path[1], start)
+                    else:
+                        for i in range(-path[1]):
+                            self.renderPixel(start, i - path[1] + 1)
 
     def clear(self):
         self.currentPixels = []
         for i in range(0, self.width):
-            self.printToConsole(Black, self.getXPos() + i, self.getYPos(), self, self.parentWidth, self.parentHeight)
-        for i in range(0, self.height):
-            self.printToConsole(Black, self.getXPos(), self.getYPos() + i, self, self.parentWidth, self.parentHeight)
-
+            for j in range(0, self.height):
+                self.printToConsole(Black, self.getXPos() + i, self.getYPos() + j, self, self.parentWidth, self.parentHeight)
+                
     def render(self, x = None, y = None):
         if (x != None and y != None):
             if self.checkPixel(x, y):
@@ -132,19 +86,19 @@ class Score(Sprite):
             return
         self.clear()
         options = {
-           0 : self.zero,
-           1 : self.one,
-           2 : self.two,
-           3 : self.three,
-           4 : self.four,
-           5 : self.five,
-           6 : self.six,
-           7 : self.seven,
-           8 : self.eight,
-           9 : self.nine,
-	       10 : self.winner,
+           0 : 'top3 left5 right5 bottom3',
+           1 : 'top2 center5 bottom3',
+           2 : 'top3 left3 right-2 bottom3 middle3',
+           3 : 'top3 middle3 right5 bottom3',
+           4 : 'left-2 middle3 right5',
+           5 : 'top3 left-2 right3 bottom3 middle3',
+           6 : 'top3 left5 right3 bottom3 middle3',
+           7 : 'top3 left-2 right5',
+           8 : 'top3 left5 right5 bottom3 middle3',
+           9 : 'top3 left-2 right5 middle3',
+	       10: 'center-2 left-2 right-2 middle3',
         }
-        options[self.number]()
+        self.renderNumber(options[self.number])
 
     def __str__(self):
         return " "
